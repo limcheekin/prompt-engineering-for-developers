@@ -38,5 +38,28 @@ def get_completion(prompt: str = None,
     return completion['message']
 
 
+def format(messages=[], system="", user="Human: ", assistant="AI: "):
+    """
+    Format the messages from the API into human readable strings.
+    """
+    formatted_message = ""
+
+    for message in messages:
+        if message['role'] == 'system':
+            formatted_message += f"{system}{message['content']}\n"
+        elif message['role'] == 'user':
+            formatted_message += f"{user}{message['content']}\n"
+        elif message['role'] == 'assistant':
+            formatted_message += f"{assistant}{message['content']}\n"
+
+    return formatted_message
+
+
+def get_completion_from_messages(messages=[],
+                                 params: dict = None):
+    prompt = format(messages)
+    return get_completion(prompt, params)
+
+
 if __name__ == '__main__':
     print(get_completion('AI is going to', params={"temp": 0.5}))

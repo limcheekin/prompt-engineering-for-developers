@@ -1,3 +1,7 @@
 gpt4all-j
 requests
 python-dotenv
+panel
+jupyter_bokeh
+jupyterlab
+
