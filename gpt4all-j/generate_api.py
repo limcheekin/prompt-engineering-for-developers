@@ -39,4 +39,4 @@ def get_completion(prompt: str = None,
 
 
 if __name__ == '__main__':
-    print(get_completion('AI is going to'))
+    print(get_completion('AI is going to', params={"temp": 0.5}))
