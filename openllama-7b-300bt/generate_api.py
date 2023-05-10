@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+import copy
 from dotenv import load_dotenv
 
 load_dotenv()  # take environment variables from .env.
@@ -16,13 +17,22 @@ default_params: dict = {
 }
 """
 
-
+completion_prompt_template = "Q: {}? A: "
+default_completion_params = {"stop": ["Q:", "A:", "\n"]} 
+user="Human: "
+assistant="AI: "
+default_chat_params = {"stop": [user, assistant, "\n"]} 
 def get_completion(prompt: str = None,
-                   params: dict = None):
-    if params:
-        payload = {"prompt": prompt, "params": params}
-    else:
-        payload = {"prompt": prompt}
+                   params: dict = None,
+                   is_completion: bool = True):
+    if is_completion:
+        prompt = completion_prompt_template.format(prompt)
+        completion_params = copy.deepcopy(default_completion_params)
+        if params:
+            completion_params.update(params)
+        params = completion_params
+    print("params", params)    
+    payload = {"prompt": prompt, "params": params}
     api_url = os.environ.get("API_URL")
     headers = {
         "Content-Type": "application/json",
@@ -35,7 +45,7 @@ def get_completion(prompt: str = None,
     return completion['message']['choices'][0]['text']
 
 
-def format(messages=[], system="", user="Human: ", assistant="AI: "):
+def format(messages=[], system="", user=user, assistant=assistant):
     """
     Format the messages from the API into human readable strings.
     """
@@ -55,7 +65,10 @@ def format(messages=[], system="", user="Human: ", assistant="AI: "):
 def get_completion_from_messages(messages=[],
                                  params: dict = None):
     prompt = format(messages)
-    return get_completion(prompt, params)
+    chat_params = copy.deepcopy(default_chat_params)
+    if params:
+        chat_params.update(params)
+    return get_completion(prompt, chat_params, is_completion = False)
 
 
 if __name__ == '__main__':
